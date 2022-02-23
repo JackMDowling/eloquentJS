@@ -104,21 +104,47 @@ const nth = (list, number) => {
 
 // console.log(nth(arrayToList([10, 20, 30, 40, 50, 60, 70, 80, 90, 100]), 4));
 
-const deepEquals = (a, b) => {
-  if (
-    typeof a === "object" &&
-    typeof b === "object" &&
-    a !== null &&
-    b !== null
-  ) {
-      const aKeys = Object.keys(a);
-      const bKeys = Object.keys(b);
-      if (aKeys.length !== bKeys.length) { 
-        return false;
-      } 
-  } else if (a === b) {
-    return true;
-  } else {
+const deepEqual = (a, b) => {
+  if (typeof a !== typeof b) {
     return false;
+  } else if (a === null || b === null) {
+    return false;
+  } else if (Array.isArray(a) && Array.isArray(b)) {
+    if (a.length !== b.length) {
+      return false;
+    } else if (a.length === b.length) {
+      for (let i = 0; i < a.length; i++) {
+        if (a[i] !== b[i]) {
+          return false;
+        }
+      }
+    }
+  } else if (typeof a === "object" && typeof b === "object") {
+    let aKeys = Object.keys(a);
+    let bKeys = Object.keys(b);
+    // console.log(aKeys);
+    if (aKeys.length !== bKeys.length) {
+      return false;
+    } else {
+      for (let i = 0; i < aKeys.length; i++) {
+        let aKey = aKeys[i];
+        let bKey = bKeys[i];
+        if (a[aKey] !== b[bKey]) {
+          return false;
+        } else if (a[aKey] === b[bKey]) {
+          if (typeof a[aKey] === "object") {
+            return deepEqual(a[aKey], b[bKey]);
+          }
+        }
+      }
+    }
   }
+
+  return true;
 };
+
+let obj = { here: { is: "an" }, object: 2 };
+console.log(deepEqual(obj, obj));
+
+console.log(deepEqual(obj, {here: 1, object: 2}));
+// → false
